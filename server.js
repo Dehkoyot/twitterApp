@@ -11,13 +11,14 @@ var express = require('express'),
 var app = express();
 var port = process.env.PORT || 8080;
 
+
 app.engine('handlebars', exphbs({ defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 
 app.disable('etag');
 
-
-mongoose.connect('mongodb://localhost/react-tweets',{ useMongoClient: true });
+mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://localhost/react-tweets', {useMongoClient:true});
 
 var twit = new twitter(config.twitter);
 
@@ -33,6 +34,15 @@ var server = http.createServer(app).listen(port, function() {
 
 var io = require('socket.io').listen(server);
 
-twit.stream('statuses/filter',{ track: 'javascript'}, function(stream){
-  streamHandler(stream,io);
-});
+    if (process.browser) {
+        var keyword = document.getElementById("key").value;
+    }
+
+    var keyword='google';
+
+
+    twit.stream('statuses/filter', {track: keyword}, function (stream) {
+        streamHandler(stream, io);
+    });
+
+
